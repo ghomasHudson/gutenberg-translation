@@ -105,7 +105,7 @@ def get_text(book_id, lang="en"):
             print()
 
         # Add license back in
-        with open("license.txt") as f_license:
+        with open("gutenberg_license.txt") as f_license:
             for line in f_license:
                 f.write(line)
             # print("...")
