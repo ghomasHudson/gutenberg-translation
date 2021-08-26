@@ -1,12 +1,34 @@
 #!/bin/sh
+# Run all the steps to go from a chapter aligned file to a sentence aligned one.
 
+echo "Filtering..."
 python filter.py en.txt > en.txt.filter
 python filter.py fr.txt > fr.txt.filter
+echo "   Done."
 
-python to_sent_per_line.py en.txt.filter en > en.txt.sent
-python to_sent_per_line.py fr.txt.filter fr > fr.txt.sent
+echo "Converting to 1 sent per line..."
+echo "en"
+python to_sent_per_line.py en.txt.filter en
+echo "fr"
+python to_sent_per_line.py fr.txt.filter fr
+echo "   Done."
 
-python translate.py en.txt.filter en fr > en.txt.fr
-python to_sent_per_line.py fr.txt.filter fr en > fr.txt.en
+echo "Translating..."
+echo "en"
+for file in en/*; do
+    python translate.py $file en fr > ${file}.fr
+done
 
-./Bleualign/bleualign -s en.txt.sent -t fr.txt.sent --srctotarget en.txt.fr --targettosrc fr.txt.en -o output
+echo "fr"
+for file in fr/*; do
+    python translate.py $file fr en > ${file}.en
+done
+echo "   Done."
+
+echo "Aligning..."
+rm -rf aligned
+mkdir aligned
+for file in en/*.txt; do
+   ./Bleualign/bleualign.py -s $file -t fr/`basename $file` --srctotarget ${file}.fr --targettosrc fr/`basename $file`.en -o aligned/`basename $file`
+done
+echo "   Done."
