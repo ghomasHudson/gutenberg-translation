@@ -29,4 +29,4 @@ for line in lines:
 
 for chunk in chunks:
     print(translator.translate(chunk))
-    time.sleep(0.5)
+    time.sleep(2)
